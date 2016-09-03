@@ -1,0 +1,12 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+GameOfLife	gameoflife.rb	/^class GameOfLife$/;"	c
+initialize	gameoflife.rb	/^  def initialize$/;"	f	class:GameOfLife
+live_or_die	gameoflife.rb	/^  def live_or_die(pos_x, pos_y)$/;"	f	class:GameOfLife.neighbours_coords.neighbours
+neighbours	gameoflife.rb	/^  def neighbours(pos_x, pos_y)$/;"	f	class:GameOfLife.neighbours_coords
+neighbours_coords	gameoflife.rb	/^  def neighbours_coords(pos_x, pos_y)$/;"	f	class:GameOfLife
+show	gameoflife.rb	/^  def show$/;"	f	class:GameOfLife
