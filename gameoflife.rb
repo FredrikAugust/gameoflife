@@ -39,7 +39,7 @@ class GameOfLife
   def show
     @board.each_with_index do |row, x|
       row.each_with_index do |cell, y|
-        Ncurses.mvaddstr(x, y, (cell == 1 ? 'O' : '.'))
+        Ncurses.mvaddstr(x, y, (cell == 1 ? '#' : '.'))
         Ncurses.refresh
       end
     end
@@ -59,10 +59,15 @@ class GameOfLife
     coords
   end
 
+  # check if cell goes outside boundary
+  def invalid_cell?(pos)
+    pos[0] < 0 || pos[1] < 0 || pos[0] > MAXX || pos[1] > MAXY
+  end
+
   # return the sum of alive neighbors
   def neighbours(pos_x, pos_y)
     cells = neighbours_coords(pos_x, pos_y).flatten.each_slice(2).map do |c|
-      next if c[0] < 0 || c[1] < 0 || c[0] > MAXX || c[1] > MAXY
+      next if invalid_cell? c
       cell(c[0], c[1])
     end
 
@@ -108,8 +113,7 @@ class GameOfLife
   # close down everything and enable cursor
   def close_game
     show
-    Ncurses.mvaddstr(MAXY, 0,
-                     'Press any key to exit')
+    Ncurses.mvaddstr(MAXY, 0, 'Press any key to exit')
     Ncurses.getch
     Ncurses.curs_set(1)
     Ncurses.endwin
