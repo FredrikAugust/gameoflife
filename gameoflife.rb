@@ -10,7 +10,7 @@ Ncurses.initscr
 Ncurses.curs_set(0)
 
 MAXX = Ncurses.getmaxx(Ncurses.stdscr)
-MAXY = Ncurses.getmaxy(Ncurses.stdscr) - 1
+MAXY = Ncurses.getmaxy(Ncurses.stdscr)
 
 # main class that contains all logic
 class GameOfLife
@@ -113,15 +113,15 @@ class GameOfLife
   # close down everything and enable cursor
   def close_game
     show
-    Ncurses.mvaddstr(MAXY, 0, 'Press any key to exit')
+    Ncurses.mvaddstr(MAXY - 1, 0, 'Press any key to exit')
     Ncurses.getch
     Ncurses.curs_set(1)
     Ncurses.endwin
   end
 
   # run the program x times
-  def run(times = 2500, sleep_period = 0)
-    times.times do
+  def run(sleep_period = 0)
+    loop do
       show
       evolve
       sleep(sleep_period)
