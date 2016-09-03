@@ -19,7 +19,7 @@ class GameOfLife
 
   def show
     @board.transpose.each do |row|
-      row.each { |cell| print cell == 1 ? '#' : '.' }
+      row.each { |cell| print cell == 1 ? '█' : '░' }
       print "\n"
     end
   end
@@ -85,7 +85,7 @@ class GameOfLife
   end
 
   # run the program x times
-  def run(times = 2500, sleep_period = 0.5)
+  def run(times = 2500, sleep_period = 0.1)
     print "\e[2J\e[f"
     times.times do |t|
       puts "Generation #{t}"
