@@ -4,6 +4,11 @@
 #
 # Distributed under terms of the GPLv3 license.
 
+require 'ncurses'
+
+Ncurses.initscr
+Ncurses.curs_set(0)
+
 SIZE = File.open('board.txt').count
 
 # main class that contains all logic
@@ -18,9 +23,11 @@ class GameOfLife
   end
 
   def show
-    @board.transpose.each do |row|
-      row.each { |cell| print cell == 1 ? '█' : '░' }
-      print "\n"
+    @board.transpose.each_with_index do |row, x|
+      row.each_with_index do |cell, y|
+        Ncurses.mvaddstr(x, y, (cell == 1 ? 'O' : '.'))
+        Ncurses.refresh
+      end
     end
   end
 
@@ -84,17 +91,25 @@ class GameOfLife
     @board = temp_board
   end
 
+  # close down everything and enable cursor
+  def close_game
+    show
+    Ncurses.mvaddstr(Ncurses.getmaxy(Ncurses.stdscr) - 1, 0,
+                     'Press any key to exit')
+    Ncurses.getch
+    Ncurses.curs_set(1)
+    Ncurses.endwin
+  end
+
   # run the program x times
-  def run(times = 2500, sleep_period = 0.1)
-    print "\e[2J\e[f"
-    times.times do |t|
-      puts "Generation #{t}"
+  def run(times = 2500, sleep_period = 0)
+    times.times do
       show
       evolve
       sleep(sleep_period)
-      print "\e[2J\e[f"
     end
-    show
+  ensure
+    close_game
   end
 end
 
