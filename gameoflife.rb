@@ -9,21 +9,35 @@ require 'ncurses'
 Ncurses.initscr
 Ncurses.curs_set(0)
 
-SIZE = File.open('board.txt').count
+MAXX = Ncurses.getmaxx(Ncurses.stdscr)
+MAXY = Ncurses.getmaxy(Ncurses.stdscr) - 1
 
 # main class that contains all logic
 class GameOfLife
   def initialize
-    @board = Array.new(SIZE) { Array.new(SIZE, 0) }
-
+    @board = Array.new(MAXX) { Array.new(MAXY, 0) }
     content = File.readlines 'board.txt'
     content.each_with_index do |line, y|
-      line.chomp.split('').each_with_index { |c, x| @board[x][y] = c.to_i }
+      line.chomp.split('').each_with_index { |c, x| @board[y][x] = c.to_i }
+    end
+
+    fill_board
+  end
+
+  # fill up the part of the board that isn't specified in input file
+  def fill_board
+    MAXY.times do |t|
+      @board << Array.new(MAXX, 0) if @board[t].nil?
+    end
+
+    @board.map! do |row|
+      row << [0] * (MAXX - row.size)
+      row.flatten
     end
   end
 
   def show
-    @board.transpose.each_with_index do |row, x|
+    @board.each_with_index do |row, x|
       row.each_with_index do |cell, y|
         Ncurses.mvaddstr(x, y, (cell == 1 ? 'O' : '.'))
         Ncurses.refresh
@@ -48,7 +62,7 @@ class GameOfLife
   # return the sum of alive neighbors
   def neighbours(pos_x, pos_y)
     cells = neighbours_coords(pos_x, pos_y).flatten.each_slice(2).map do |c|
-      next if c.any? { |coord| coord < 0 || coord > SIZE - 1 }
+      next if c[0] < 0 || c[1] < 0 || c[0] > MAXX || c[1] > MAXY
       cell(c[0], c[1])
     end
 
@@ -59,7 +73,7 @@ class GameOfLife
 
   # get value of cell
   def cell(pos_x, pos_y)
-    @board[pos_x][pos_y]
+    @board[pos_y][pos_x]
   end
 
   # determine whether the cell should live or die
@@ -80,11 +94,11 @@ class GameOfLife
   # evolve the board
   def evolve
     # store the new board in here
-    temp_board = Array.new(SIZE) { Array.new(SIZE, 0) }
+    temp_board = Array.new(MAXX) { Array.new(MAXY, 0) }
 
-    (0...SIZE).each do |x|
-      (0...SIZE).each do |y|
-        temp_board[x][y] = live_or_die(x, y)
+    (0...MAXX).each do |x|
+      (0...MAXY).each do |y|
+        temp_board[y][x] = live_or_die(x, y)
       end
     end
 
@@ -94,7 +108,7 @@ class GameOfLife
   # close down everything and enable cursor
   def close_game
     show
-    Ncurses.mvaddstr(Ncurses.getmaxy(Ncurses.stdscr) - 1, 0,
+    Ncurses.mvaddstr(MAXY, 0,
                      'Press any key to exit')
     Ncurses.getch
     Ncurses.curs_set(1)
@@ -114,5 +128,4 @@ class GameOfLife
 end
 
 game = GameOfLife.new
-game.show # before the program starts
 game.run
