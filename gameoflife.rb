@@ -4,21 +4,17 @@
 #
 # Distributed under terms of the GPLv3 license.
 
-SIZE = 70
+SIZE = File.open('board.txt').count
 
 # main class that contains all logic
 class GameOfLife
   def initialize
     @board = Array.new(SIZE) { Array.new(SIZE, 0) }
 
-    # Acorn preset, really dope
-    @board[20][20] = 1
-    @board[21][20] = 1
-    @board[21][18] = 1
-    @board[23][19] = 1
-    @board[24][20] = 1
-    @board[25][20] = 1
-    @board[26][20] = 1
+    content = File.readlines 'board.txt'
+    content.each_with_index do |line, y|
+      line.chomp.split('').each_with_index { |c, x| @board[x][y] = c.to_i }
+    end
   end
 
   def show
@@ -89,7 +85,7 @@ class GameOfLife
   end
 
   # run the program x times
-  def run(times = 2500, sleep_period = 0.1)
+  def run(times = 2500, sleep_period = 0.5)
     print "\e[2J\e[f"
     times.times do |t|
       puts "Generation #{t}"
