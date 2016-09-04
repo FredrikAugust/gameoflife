@@ -4,13 +4,10 @@
 #
 # Distributed under terms of the GPLv3 license.
 
-require 'ncurses'
+require 'gosu'
 
-Ncurses.initscr
-Ncurses.curs_set(0)
-
-MAXX = Ncurses.getmaxx(Ncurses.stdscr)
-MAXY = Ncurses.getmaxy(Ncurses.stdscr)
+MAXX = 200
+MAXY = 100
 
 # main class that contains all logic
 class GameOfLife
@@ -33,15 +30,6 @@ class GameOfLife
     @board.map! do |row|
       row << [0] * (MAXX - row.size)
       row.flatten
-    end
-  end
-
-  def show
-    @board.each_with_index do |row, x|
-      row.each_with_index do |cell, y|
-        Ncurses.mvaddstr(x, y, (cell == 1 ? '#' : '.'))
-        Ncurses.refresh
-      end
     end
   end
 
@@ -110,26 +98,34 @@ class GameOfLife
     @board = temp_board
   end
 
-  # close down everything and enable cursor
-  def close_game
-    show
-    Ncurses.mvaddstr(MAXY - 1, 0, 'Press any key to exit')
-    Ncurses.getch
-    Ncurses.curs_set(1)
-    Ncurses.endwin
+  attr_reader :board
+end
+
+# gosu main class for displaying game
+class GameOfLifeWindow < Gosu::Window
+  def initialize
+    super MAXX, MAXY, :fullscreen
+    self.caption = 'Game of Life'
+
+    @game = GameOfLife.new
   end
 
-  # run the program x times
-  def run(sleep_period = 0)
-    loop do
-      show
-      evolve
-      sleep(sleep_period)
+  def update
+    exit if Gosu.button_down? Gosu.char_to_button_id('q')
+    @game.evolve
+  end
+
+  def draw
+    @game.board.each_with_index do |row, x|
+      row.each_with_index do |cell, y|
+        color = cell == 1 ? 0xffffffff : 0xff000000
+
+        draw_quad(y, x, color, y + 1, x, color, y, x + 1, color,
+                  y + 1, x + 1, color, 100)
+      end
     end
-  ensure
-    close_game
   end
 end
 
-game = GameOfLife.new
-game.run
+window = GameOfLifeWindow.new
+window.show
